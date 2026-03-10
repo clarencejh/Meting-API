@@ -33,11 +33,16 @@ const trimLyric = (lyric) => {
   const result = []
   const lines = lyric.split('\n')
   for (const line of lines) {
-    const match = line.match(/^\[(\d{2}):(\d{2}\.\d*)\](.*)$/)
+    // 匹配两种格式：[mm:ss.xxx] 或 [hh:mm:ss]
+    const match = line.match(/^\[(?:(\d{2}):)?(\d{2}):(\d{2})(?:\.(\d+))?\](.*)$/)
     if (match) {
+      const hours = match[1] ? parseInt(match[1], 10) : 0
+      const minutes = parseInt(match[2], 10)
+      const seconds = parseInt(match[3], 10)
+      const milliseconds = match[4] ? parseInt(match[4].padEnd(3, '0').slice(0, 3), 10) : 0
       result.push({
-        time: parseInt(parseInt(match[1], 10) * 60 * 1000 + parseFloat(match[2]) * 1000),
-        text: match[3]
+        time: hours * 3600000 + minutes * 60000 + seconds * 1000 + milliseconds,
+        text: match[5]
       })
     }
   }
